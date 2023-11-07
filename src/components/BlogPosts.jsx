@@ -12,7 +12,7 @@ const BlogPosts = () => {
   const [posts, setPosts] = useState([]);
 
   const fetchBlogPosts = async () => {
-    const response = await api.get("/posts_blog/");
+    const response = await api.get("/articles");
     setPosts(response.data);
   };
 
@@ -22,9 +22,8 @@ const BlogPosts = () => {
 
   const initialValues = {
     title: "",
+    author: "",
     content: "",
-    description: "",
-    date: "",
   };
 
   const SignupSchema = Yup.object().shape({
@@ -32,7 +31,7 @@ const BlogPosts = () => {
       .min(5, "Too Short!")
       .max(50, "Too Long!")
       .required("Required"),
-    description: Yup.string()
+    author: Yup.string()
       .min(10, "Too Short!")
       .max(50, "Too Long!")
       .required("Required"),
@@ -40,7 +39,7 @@ const BlogPosts = () => {
       .min(10, "Too Short!")
       .max(200, "Too Long!")
       .required("Required"),
-    date: Yup.string().required(),
+    // date: Yup.string().required(),
   });
 
   return (
@@ -50,11 +49,14 @@ const BlogPosts = () => {
           initialValues={initialValues}
           validationSchema={SignupSchema}
           onSubmit={async (values) => {
+            if (!values.title || !values.author || !values.content) {
+              return;
+            }
             try {
-              const response = await api.post("/posts_blog/", values);
+              const response = await api.post("/articles", values);
               console.log(response);
               if (response.status === 201) {
-                fetchBlogPosts();
+                // fetchBlogPosts();
                 alert("Post created successfully");
               }
             } catch (error) {
@@ -68,12 +70,12 @@ const BlogPosts = () => {
         >
           {({ values, errors, touched }) => (
             <Form className=" row g-3 align-items-center justify-content-center w-50 m-auto">
-              <div className=" col-md-6">
+              <div className=" col-md-12">
                 <label htmlFor="title">Title</label>
                 <Field
                   className="w-100"
                   type="text"
-                  name="title"
+                  name="values.title"
                   arial-label="title"
                 />
                 {touched.title && errors.title && (
@@ -81,32 +83,24 @@ const BlogPosts = () => {
                 )}
               </div>
 
-              <div className="col-md-6  ">
-                <label htmlFor="content">Content</label>
-                <div>
-                  <Field type="text" name="content" className="w-100" />
-                  {touched.content && errors.content && (
-                    <span className="text-danger">{errors.content}</span>
-                  )}
-                </div>
-              </div>
-
-              <div className=" col-md-6 ">
+              <div className=" col-md-12 ">
                 <label htmlFor="title">Description</label>
-                <Field className="w-100" type="text" name="description" />
-                {touched.description && errors.description && (
+                <Field className="w-100" type="text" name="author" />
+                {touched.author && errors.author && (
                   <span className="text-danger">
-                    {errors.description}
+                    {errors.author}
                   </span>
                 )}
               </div>
 
-              <div className="col-md-6   ">
-                <label htmlFor="date">Date</label>
-                <Field type="date" name="date" className="w-100" />
-                {touched.date && errors.date && (
-                  <span className="text-danger">{errors.date}</span>
-                )}
+              <div className="col-md-12  ">
+                <label htmlFor="content">Content</label>
+                <div>
+                  <Field type="text" name="values.content" className="w-100" />
+                  {touched.content && errors.content && (
+                    <span className="text-danger">{errors.content}</span>
+                  )}
+                </div>
               </div>
 
               <div className="col-12 mt-4 d-flex-md justify-content-end-md">
